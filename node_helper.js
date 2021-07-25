@@ -1,15 +1,15 @@
 /* node_helper.js
- * 
+ *
  * Magic Mirror
  * Module: MMM-DCMetroTimes
- * 
+ *
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
- * 
+ *
  * Module MMM-DCMetroTimes By Kyle Kelly
  *
  * Forked From:
- * 
+ *
  * Module MMM-DCMetroTrainTimes By Adam Moses http://adammoses.com
  */
 
@@ -35,8 +35,8 @@ module.exports = NodeHelper.create({
 			if (theConfig.showIncidents)
 			{
 
-				this.updateIncidents(theConfig);	
-                setInterval(function() { self.updateIncidents(theConfig); }, 
+				this.updateIncidents(theConfig);
+                setInterval(function() { self.updateIncidents(theConfig); },
                     theConfig.refreshRateIncidents);
 			}
             // if config-ed to show station train times, start that up
@@ -45,7 +45,7 @@ module.exports = NodeHelper.create({
                 // delay the first train times check to not collide with first incident update
                 setTimeout(function() { self.updateTrainTimes(theConfig); },
                     1000);
-                setInterval(function() { self.updateTrainTimes(theConfig); }, 
+                setInterval(function() { self.updateTrainTimes(theConfig); },
                     theConfig.refreshRateStationTrainTimes);
 			}
 			// if config-ed to show bus times, start that up
@@ -54,9 +54,9 @@ module.exports = NodeHelper.create({
                 // delay the first bus times check to not collide with first incident update
                 setTimeout(function() { self.updateBusTimes(theConfig); },
                     1000);
-                setInterval(function() { self.updateBusTimes(theConfig); }, 
+                setInterval(function() { self.updateBusTimes(theConfig); },
                     theConfig.refreshRateBusStopTimes);
-			}		
+			}
 			return;
 		}
 	},
@@ -73,7 +73,7 @@ module.exports = NodeHelper.create({
 		if (this.stationInformationList === null) {
 			var fileData = fs.readFileSync(path + '/stationcodes/stationcodes.json');
 			this.stationInformationList = JSON.parse(fileData);
-		}				
+		}
 	},
     // get the station name for a given station code
 	getStationName: function(theStationCode) {
@@ -83,13 +83,13 @@ module.exports = NodeHelper.create({
 	        var stationName = this.stationInformationList[cIndex].Name;
 	        if (stationCode === theStationCode)
 	        	return stationName;
-	    }   
+	    }
         // otherwise return null
 	    return null;
 	},
 	// --- INCIDENT STUFF ---
     // builds a full-text named list from the given line colors codes
-	parseLinesAffectedForColors: function(theLinesAffected, theLinesList) {    
+	parseLinesAffectedForColors: function(theLinesAffected, theLinesList) {
 		var cLinesAffected = theLinesAffected.toUpperCase();
         var cAllCodes = [ 'BL', 'GR', 'OR', 'RD', 'SV', 'YL' ];
 		var cReturnLines = theLinesList;
@@ -98,15 +98,15 @@ module.exports = NodeHelper.create({
         for (var cIndex = 0; cIndex < cAllCodes.length; cIndex++)
         {
             var cCode = cAllCodes[cIndex];
-       		if (cLinesAffected.includes(cCode) && (cReturnLines.indexOf(cCode) === -1)) 
-                cReturnLines[cReturnLines.length] = cCode;     
+       		if (cLinesAffected.includes(cCode) && (cReturnLines.indexOf(cCode) === -1))
+                cReturnLines[cReturnLines.length] = cCode;
         }
 		return cReturnLines;
 	},
-    // main function to parse incididents    
+    // main function to parse incididents
 	parseIncidents: function(theConfig, theIncidentList) {
 	    var descriptionList = [];
-	    var linesList = [];	  
+	    var linesList = [];
         // iterate through incident list
         // add each description to the description list, TODO: use this list
         // parse the lines affect for colors and track all color lines
@@ -117,7 +117,7 @@ module.exports = NodeHelper.create({
 	        linesList = this.parseLinesAffectedForColors(incident.LinesAffected, linesList);
 	    }
         // return the module ID, description list, and list of color line incidents
-	    var returnPayload = { 
+	    var returnPayload = {
 	        identifier: theConfig.identifier,
 	        descriptionList: descriptionList,
 	        linesList: linesList
@@ -128,10 +128,10 @@ module.exports = NodeHelper.create({
     // makes the call to get the incidents
 	updateIncidents: function(theConfig){
         // create the REST API call URL
-	    var wmataIncidentURL = 
-            'https://api.wmata.com/Incidents.svc/json/Incidents?api_key=' 
+	    var wmataIncidentURL =
+            'https://api.wmata.com/Incidents.svc/json/Incidents?api_key='
             + theConfig.wmata_api_key;
-        // create a self to use in the async call                                
+        // create a self to use in the async call
 	    var self = this;
 	    https.get(wmataIncidentURL, (res) => {
 	      let rawData = '';
@@ -150,19 +150,19 @@ module.exports = NodeHelper.create({
     // checks if the destination code is in not the list destinations to exclue
     // returns true if not found
     // return false if found
-	doesNotContainExcludedDestination: function(theConfig, theStationCode, theDestinationCode) {        
+	doesNotContainExcludedDestination: function(theConfig, theStationCode, theDestinationCode) {
         // iterate through destinations to exclude, if one matches return false
         for (var cIndex = 0; cIndex < theConfig.destinationsToExcludeList.length; cIndex++) {
             var destToExclude = theConfig.destinationsToExcludeList[cIndex];
             if (theDestinationCode === destToExclude)
                 return false;
-        }        
+        }
         // otherwise return true
         return true;
 	},
     // checks that train time string is not less than the configured time
     // to show it
-	isNotLessThanConfigThreshold: function(theConfig, theMin) {        
+	isNotLessThanConfigThreshold: function(theConfig, theMin) {
         if (theConfig.hideTrainTimesLessThan === 0)
             return true;
         var cMin = theMin;
@@ -172,7 +172,7 @@ module.exports = NodeHelper.create({
         if (cMin < theConfig.hideTrainTimesLessThan)
             return false;
         return true;
-	},    
+	},
     // builds part of the REST API URL query to call based on station codes
 	getTrainQuery: function(theConfig) {
 	    var returnQuery = "";
@@ -182,7 +182,7 @@ module.exports = NodeHelper.create({
 	        returnQuery += stationCode;
 	        if (cIndex !== (theConfig.stationsToShowList.length - 1))
 	            returnQuery += ",";
-	    }    
+	    }
 	    return returnQuery;
 	},
     // build an empty station train times list to return in the payload
@@ -199,8 +199,8 @@ module.exports = NodeHelper.create({
                     StationCode: stationCode,
                     TrainList: []
                     };
-                returnList[stationCode] = initStationPart;               
-            } 
+                returnList[stationCode] = initStationPart;
+            }
 	    }
         return returnList;
     },
@@ -220,9 +220,9 @@ module.exports = NodeHelper.create({
 	            var tDestinationName  = train.DestinationName;
 	            var tDestinationCode  = train.DestinationCode;
 	            var tLine             = train.Line;
-	            var tMin              = train.Min;            
+	            var tMin              = train.Min;
 	            var trainListPart = stationTrainList[tLocationCode].TrainList;
-		
+
 		// if value is set in the config for showDestinationFullName, use that value
 		    if (theConfig.showDestinationFullName == "true")
 		    {
@@ -232,7 +232,7 @@ module.exports = NodeHelper.create({
 		    {
 		    	var tDestination = train.Destination;
 		    }
-		    
+
 
                 // build the train part
 	            var trainPart = { Destination: tDestination,
@@ -249,14 +249,14 @@ module.exports = NodeHelper.create({
                     && (tDestinationCode !== '')
                     && (tDestinationName !== "Train")
                     && (tLine !== "--")
-                    && (tMin !== '') )                    
+                    && (tMin !== '') )
 	            	trainListPart[trainListPart.length] = trainPart;
                 // set the main station train list object to the train list part
 	            stationTrainList[tLocationCode].TrainList = trainListPart;
 	        }
 	    }
-        // return payload is the module id and the station train list 
-	    var returnPayload = { 
+        // return payload is the module id and the station train list
+	    var returnPayload = {
 	        identifier: theConfig.identifier,
 	        stationTrainList: stationTrainList
 	    };
@@ -264,17 +264,17 @@ module.exports = NodeHelper.create({
 	    this.sendSocketNotification('DCMETRO_STATIONTRAINTIMES_UPDATE', returnPayload);
 	},
     // makes the call to get the train times list
-	updateTrainTimes: function(theConfig){   
+	updateTrainTimes: function(theConfig){
 	    var self = this;
         // get query part of the REST API URL
 		var trainQuery = self.getTrainQuery(theConfig);
         // build the full URL call
-        var wmataTrainTimesURL = 
-	        'https://api.wmata.com/StationPrediction.svc/json/GetPrediction/' 
-	        + trainQuery 
-	        + '?api_key=' 
+        var wmataTrainTimesURL =
+	        'https://api.wmata.com/StationPrediction.svc/json/GetPrediction/'
+	        + trainQuery
+	        + '?api_key='
 	        + theConfig.wmata_api_key;
-        // make the async call        
+        // make the async call
 	    https.get(wmataTrainTimesURL, (res) => {
 	      let rawData = '';
 	      res.on('data', (chunk) => rawData += chunk);
@@ -297,25 +297,25 @@ module.exports = NodeHelper.create({
 	    for (var cIndex = 0; cIndex < theConfig.stopsToShowList.length; cIndex++) {
 	    	var stopID = theConfig.stopsToShowList[cIndex];
             if (returnList[stopID] === undefined){
-                var initStopPart = { 
+                var initStopPart = {
                 	StopID: stopID,
                 	StopName: "",
                     BusList: []
                 };
-                returnList[stopID] = initStopPart;               
-            } 
+                returnList[stopID] = initStopPart;
+            }
 	    }
         return returnList;
     },
 	// checks that bus time string is not within the configured time
     // to show it
-	isWithinConfigThreshold: function(theConfig, theMin) {        
+	isWithinConfigThreshold: function(theConfig, theMin) {
         if ( (theMin < theConfig.hideBusTimesLessThan)
         	|| (theMin > theConfig.hideBusTimesGreaterThan) ) {
             return false;
         }
         return true;
-	}, 
+	},
 	// checks if the route ID is in the list of routes to exclude
     // returns true if not found
     // return false if found
@@ -331,7 +331,7 @@ module.exports = NodeHelper.create({
 			                return false;
 			            }
 			        }
-			    }       
+			    }
 		    }
 		}
 		// otherwise return true
@@ -356,7 +356,7 @@ module.exports = NodeHelper.create({
 	            var bTripID             = bus.TripID;
 	            var busListPart 		= busStopList[stopID].BusList;
                 // build the bus part
-	            var busPart = { 
+	            var busPart = {
             		DirectionText: bDirectionText,
                 	DirectionNum: bDirectionNum,
                 	RouteID: bRouteID,
@@ -369,23 +369,14 @@ module.exports = NodeHelper.create({
                     && this.isWithinConfigThreshold(theConfig, bMinutes)
                     && (bDirectionText !== '')
                     && (bDirectionNum !== '')
-                    && (bMinutes !== '') ) 
+                    && (bMinutes !== '') )
 	            	busListPart[busListPart.length] = busPart;
                 // set the main station train list object to the train list part
 	            busStopList[stopID].BusList = busListPart;
 	            busStopList[stopID].StopName = stopName;
 	        }
 	    }
-        // if we've gone through all stops, send the payload back to the module
-	    if (theConfig.stopsToShowList[theConfig.stopsToShowList.length - 1] == stopID)
-	    {
-	    	// return payload is the module id and the station train list 
-		    var returnPayload = { 
-		        identifier: theConfig.identifier,
-		        busStopList: busStopList
-		    };
-	    	this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
-	    }
+			return busStopList
 	},
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
@@ -404,13 +395,13 @@ module.exports = NodeHelper.create({
 			        api_key: theConfig.wmata_api_key
 			    }
 			};
-	        // make the async call        
+	        // make the async call
 		    https.get(params, (res) => {
 		    	let rawData = '';
 		      	res.on('data', (chunk) => rawData += chunk);
 		      	res.on('end', () => {
 	            	// once you have all the data send it to be parsed
-		        	self.parseBusTimes(theConfig, stopID, JSON.parse(rawData), busStopList);
+		        	busStopList = self.parseBusTimes(theConfig, stopID, JSON.parse(rawData), busStopList);
 		      	});
 		    })
 	        // if an error handle it
@@ -418,6 +409,13 @@ module.exports = NodeHelper.create({
 	            self.processError();
 		    });
 		}
+
+		// return payload is the module id and the station train list
+		var returnPayload = {
+				identifier: theConfig.identifier,
+				busStopList: busStopList
+		};
+		this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
 	}
 });
 
