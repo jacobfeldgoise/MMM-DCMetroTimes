@@ -387,24 +387,11 @@ module.exports = NodeHelper.create({
 					this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
 			}
 	},
-	getHTTPSbus: function(self, params){
-		// make the async call
-		https.get(params, (res) => {
-			let rawData = '';
-				res.on('data', (chunk) => rawData += chunk);
-				res.on('end', () => {
-						return rawData;
-				});
-		})
-			// if an error handle it
-		.on('error', (e) => {
-					self.processError();
-		});
-	},
+
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
 	    var self = this;
-			var rawData = "";
+			var json = "";
 	    // build an empty list in case some stations have no trains times
 	    var busStopList = this.getEmptyBusStopTimesList(theConfig);
         // iterate through comma delimited stopIDs, build accordingly and return result
@@ -416,11 +403,23 @@ module.exports = NodeHelper.create({
 			    path: '/NextBusService.svc/json/jPredictions' + '?StopID=' + stopID,
 			    method: 'GET',
 			    headers: {
-			        api_key: theConfig.wmata_api_key
-			    }
-				};
-				rawData = self.getHTTPSbus(self, params);
-				busStopList[stopID].raw = JSON.parse(rawData);
+			        			api_key: theConfig.wmata_api_key
+			    					}
+					};
+					// make the async call
+					json = https.get(params, (res) => {
+						let rawData = '';
+						res.on('data', (chunk) => rawData += chunk);
+						res.on('end', () => {
+								return JSON.parse(rawData);
+						});
+					})
+					// if an error handle it
+					.on('error', (e) => {
+						self.processError();
+					});
+
+					busStopList[stopID].raw = json;
 		}
 		// once you have all the data send it to be parsed
 		console.log(busStopList);
