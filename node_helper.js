@@ -344,10 +344,10 @@ module.exports = NodeHelper.create({
 			var responseContent, stopName, theBuses
 			for (let key in busStopList) {
 					responseContent = busStopList[key].raw;
-					//console.log(responseContent);
+					console.log(responseContent);
+					console.log(typeof(responseContent));
 					stopName = responseContent.StopName;
 					theBuses = responseContent.Predictions;
-					console.log(busStopList);
 					// iterate through the train times list
 			    for (var cIndex = 0; cIndex < theBuses.length; cIndex++){
 			        var bus = theBuses[cIndex];
