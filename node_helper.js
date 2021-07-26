@@ -343,7 +343,7 @@ module.exports = NodeHelper.create({
 	parseBusTimes: function(theConfig, busStopList) {
 			var responseContent, stopName, theBuses
 			for (let key in busStopList) {
-					responseContent = busStopList[key].raw;
+					responseContent = JSON.parse(busStopList[key].raw);
 					console.log(responseContent);
 					console.log(typeof(responseContent));
 					stopName = responseContent.StopName;
