@@ -303,7 +303,6 @@ module.exports = NodeHelper.create({
                 	StopName: "",
                   BusList: [],
 									raw: "",
-									params: {}
                 };
                 returnList[stopID] = initStopPart;
             }
@@ -348,6 +347,7 @@ module.exports = NodeHelper.create({
 					//console.log(responseContent);
 					stopName = responseContent.StopName;
 					theBuses = responseContent.Predictions;
+					console.log(busStopList);
 					// iterate through the train times list
 			    for (var cIndex = 0; cIndex < theBuses.length; cIndex++){
 			        var bus = theBuses[cIndex];
@@ -432,7 +432,6 @@ module.exports = NodeHelper.create({
 			for (var key in combinedFormatted){
 				busStopList[key].raw = combinedFormatted[key]
 			}
-			console.log(busStopList);
 			self.parseBusTimes(theConfig, busStopList);
 		}).catch((error) => {
 			console.log(error);
