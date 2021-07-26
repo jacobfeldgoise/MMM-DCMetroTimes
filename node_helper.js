@@ -16,6 +16,7 @@
 // call in the required classes
 var NodeHelper = require("node_helper");
 const https = require('https');
+const request = require('request-promise');
 const querystring = require('querystring');
 const fs = require('fs');
 // the main module helper create
@@ -301,7 +302,8 @@ module.exports = NodeHelper.create({
                 	StopID: stopID,
                 	StopName: "",
                   BusList: [],
-									raw: ""
+									raw: "",
+									params: {}
                 };
                 returnList[stopID] = initStopPart;
             }
@@ -393,39 +395,51 @@ module.exports = NodeHelper.create({
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
 	    var self = this;
-			var resp = "";
 	    // build an empty list in case some stations have no trains times
 	    var busStopList = this.getEmptyBusStopTimesList(theConfig);
-        // iterate through comma delimited stopIDs, build accordingly and return result
-	    for (var cIndex = 0; cIndex < theConfig.stopsToShowList.length; cIndex++){
-	        var stopID = theConfig.stopsToShowList[cIndex];
-	        var params = {
-			    hostname: 'api.wmata.com',
-			    port: 443,
-			    path: '/NextBusService.svc/json/jPredictions' + '?StopID=' + stopID,
-			    method: 'GET',
-			    headers: {
-			        			api_key: theConfig.wmata_api_key
-			    					}
-					};
-					// make the async call
-					resp = https.get(params, (res) => {
-							let rawData = '';
-							res.on('data', (chunk) => rawData += chunk);
-							res.on('end', () => {
-									JSON.parse(rawData);
-							});
-					})
-					// if an error handle it
-					.on('error', (e) => {
-						self.processError();
-					});
-					console.log(resp);
-					busStopList[stopID].raw = resp;
+      var stopID = theConfig.stopsToShowList[cIndex];
+      var params = {
+	    hostname: 'api.wmata.com',
+	    port: 443,
+	    path: '/NextBusService.svc/json/jPredictions' + '?StopID=',
+	    method: 'GET',
+	    headers: {
+	        			api_key: theConfig.wmata_api_key
+	    					}
+			};
+			// Now go retrieve the data
+			self.combineBusData(self, theConfig.stopsToShowList, params, busStopList);
+	},
+	callBusAPI: function(id, params, busStopList){
+	  return new Promise((resolve, reject) => {
+		  var newParams = JSON.parse(JSON.stringify(params));
+		  newParams.path = params.path + id
+		  https.get(newParams, (res) => {
+		    var body = [];
+		    var all = {};
+		    res.on('data', (chunk) => {
+		      body.push(chunk);
+		    }).on('end', () => {
+		      body = Buffer.concat(body).toString();
+		      all[id] = body
+		      resolve(all);
+		    }).on('error', reject);
+		  });
+		});
+	},
+	combineBusData: function(self, ids, params, busStopList) {
+		Promise.all(ids.map(id => callBusAPI(id, params, busStopList))).then((combined) => {
+			combinedFormatted = Object.assign({}, ...combined)
+			for (var key in combinedFormatted){
+				busStopList[key].raw = combinedFormatted[key]
 			}
-			// once you have all the data send it to be parsed
+			console.log(busStopList);
 			self.parseBusTimes(theConfig, busStopList);
+		}).catch((error) => {
+			console.log(error);
+		});
 	}
 });
+
 
 //------------ END -------------
