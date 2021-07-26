@@ -397,7 +397,6 @@ module.exports = NodeHelper.create({
 	    var self = this;
 	    // build an empty list in case some stations have no trains times
 	    var busStopList = this.getEmptyBusStopTimesList(theConfig);
-      var stopID = theConfig.stopsToShowList[cIndex];
       var params = {
 	    hostname: 'api.wmata.com',
 	    port: 443,
