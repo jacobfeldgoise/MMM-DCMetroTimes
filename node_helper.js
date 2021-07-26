@@ -387,7 +387,7 @@ module.exports = NodeHelper.create({
 					this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
 			}
 	},
-getHTTPSbus: function(self, params){
+	getHTTPSbus: function(self, params){
 		// make the async call
 		https.get(params, (res) => {
 			let rawData = '';
@@ -400,7 +400,7 @@ getHTTPSbus: function(self, params){
 		.on('error', (e) => {
 					self.processError();
 		});
-},
+	},
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
 	    var self = this;
@@ -419,7 +419,7 @@ getHTTPSbus: function(self, params){
 			        api_key: theConfig.wmata_api_key
 			    }
 				};
-				rawData = getHTTPSbus(self, params);
+				rawData = self.getHTTPSbus(self, params);
 				busStopList[stopID].raw = JSON.parse(rawData);
 		}
 		// once you have all the data send it to be parsed
