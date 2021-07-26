@@ -344,8 +344,6 @@ module.exports = NodeHelper.create({
 			var responseContent, stopName, theBuses
 			for (let key in busStopList) {
 					responseContent = JSON.parse(busStopList[key].raw);
-					console.log(responseContent);
-					console.log(typeof(responseContent));
 					stopName = responseContent.StopName;
 					theBuses = responseContent.Predictions;
 					// iterate through the train times list

@@ -1,11 +1,11 @@
 /* MMM-DCMetroTimes.js
- * 
+ *
  * Magic Mirror
  * Module: MMM-DCMetroTimes
- * 
+ *
  * Magic Mirror By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
- * 
+ *
  * Module MMM-DCMetroTimes By Kyle Kelly
  *
  * Forked From:
@@ -16,7 +16,7 @@
 // main module setup stuff
 Module.register("MMM-DCMetroTimes", {
     // setup the default config options
-    defaults: {     
+    defaults: {
         // required
         wmata_api_key: null, // this must be set
         // optional
@@ -53,7 +53,7 @@ Module.register("MMM-DCMetroTimes", {
         this.config.identifier = this.identifier;
         this.config.path = this.data.path;
         this.firstUpdateDOMFlag = false;
-        this.dataLoaded = false;        
+        this.dataLoaded = false;
         this.errorMessage = null;
         this.dataIncidentDescriptionList = null;
         this.dataIncidentLinesList = null;
@@ -63,19 +63,19 @@ Module.register("MMM-DCMetroTimes", {
         if (this.config.showHeader)
             this.data.header = this.config.headerText;
          // the api key is set, send the config
-        if (this.config.wmata_api_key !== null) 
-            this.sendSocketNotification('REGISTER_CONFIG', this.config);    
+        if (this.config.wmata_api_key !== null)
+            this.sendSocketNotification('REGISTER_CONFIG', this.config);
         // if not, flag the error
-        else 
+        else
             this.errorMessage = 'Error: Missing API Key';
         // schedule the first dom update
         var self = this;
         setTimeout(function() { self.firstUpdateDOM(); }, 2000);
-    }, 
+    },
     // delayed call for first DOM update
     firstUpdateDOM: function() {
         this.firstUpdateDOMFlag = true;
-        this.updateDom();     
+        this.updateDom();
     },
     // the socket handler
     socketNotificationReceived: function(notification, payload) {
@@ -88,7 +88,7 @@ Module.register("MMM-DCMetroTimes", {
                 this.dataIncidentLinesList = payload.linesList;
                 this.dataLoaded = true;
                 if (this.firstUpdateDOMFlag)
-                    this.updateDom();               
+                    this.updateDom();
             }
         }
         if (notification === "DCMETRO_STATIONTRAINTIMES_UPDATE")
@@ -98,8 +98,8 @@ Module.register("MMM-DCMetroTimes", {
                 this.errorMessage = null;
                 this.dataStationTrainTimesList = payload.stationTrainList;
                 this.dataLoaded = true;
-                if (this.firstUpdateDOMFlag) 
-                    this.updateDom();               
+                if (this.firstUpdateDOMFlag)
+                    this.updateDom();
             }
         }
         if (notification === "DCMETRO_BUSTOPTIMES_UPDATE")
@@ -109,8 +109,8 @@ Module.register("MMM-DCMetroTimes", {
                 this.errorMessage = null;
                 this.dataBusStopTimesList = payload.busStopList;
                 this.dataLoaded = true;
-                if (this.firstUpdateDOMFlag) 
-                    this.updateDom();               
+                if (this.firstUpdateDOMFlag)
+                    this.updateDom();
             }
         }
         if (notification === "DCMETRO_ERROR")
@@ -146,22 +146,22 @@ Module.register("MMM-DCMetroTimes", {
         return colorValues[theColorCode];
     },
     // the get dom handler
-    getDom: function() {    
+    getDom: function() {
         // if error has occured indicate so and return
         if (this.errorMessage !== null)
         {
             var wrapper = document.createElement("div");
             wrapper.className = "small";
             wrapper.innerHTML = this.errorMessage;
-            return wrapper;     
-        }      
+            return wrapper;
+        }
         // if no data has been loaded yet indicate so and return
         if (!this.dataLoaded)
         {
             var wrapper = document.createElement("div");
             wrapper.className = "small";
             wrapper.innerHTML = "Waiting For Update...";
-            return wrapper;         
+            return wrapper;
         }
         // if no error or no lack of data proceed with main HTML generation
         var wrapper = document.createElement("table");
@@ -173,9 +173,9 @@ Module.register("MMM-DCMetroTimes", {
             var headElement = document.createElement("td");
             headElement.className = "small";
             headElement.colSpan = "3";
-            headElement.innerHTML = "Incidents";                    
+            headElement.innerHTML = "Incidents";
             headRow.appendChild(headElement);
-            wrapper.appendChild(headRow);   
+            wrapper.appendChild(headRow);
             // if there are lines with incidents on them list them
             if (this.dataIncidentLinesList.length > 0)
             {
@@ -184,7 +184,7 @@ Module.register("MMM-DCMetroTimes", {
                 var incidentCount = this.dataIncidentLinesList.length
                 iElement.width = this.config.limitWidth;
                 iElement.className = "xsmall";
-                iElement.colSpan = "3";         
+                iElement.colSpan = "3";
                 if (this.config.incidentCodesOnly) {
                     iElement.align = "center";
                     var incidentHTML = "";
@@ -192,7 +192,7 @@ Module.register("MMM-DCMetroTimes", {
                         var lineCode = this.dataIncidentLinesList[lineIndex];
                         if (this.config.colorizeLines)
                             incidentHTML += "<div style=\'display:inline;color:"
-                            + this.getLineCodeColor(lineCode) 
+                            + this.getLineCodeColor(lineCode)
                             + "\'>";
                         else
                             incidentHTML += "<div style=\'display:inline;\'>";
@@ -202,7 +202,7 @@ Module.register("MMM-DCMetroTimes", {
                     }
                     iElement.innerHTML = incidentHTML;
                 }
-                else {                    
+                else {
                      // create a string and add each incident line's color to the string
                     iElement.align = "left";
                     var incidentHTML = "";
@@ -212,12 +212,12 @@ Module.register("MMM-DCMetroTimes", {
                         incidentHTML += "Incidents Reported On ";
                     for (var lineIndex = 0; lineIndex < incidentCount; lineIndex++){
                         var lineCode = this.dataIncidentLinesList[lineIndex];
-                        if ((lineIndex === incidentCount - 1) 
+                        if ((lineIndex === incidentCount - 1)
                             && (this.dataIncidentLinesList.length > 1))
                             incidentHTML += "and ";
                         if (this.config.colorizeLines)
                             incidentHTML += "<div style=\'display:inline;color:"
-                            + this.getLineCodeColor(lineCode) 
+                            + this.getLineCodeColor(lineCode)
                             + "\'>";
                         else
                             incidentHTML += "<div style=\'display:inline;\'>";
@@ -232,9 +232,9 @@ Module.register("MMM-DCMetroTimes", {
                         incidentHTML += "Line";
                     else
                         incidentHTML += "Lines";
-                    iElement.innerHTML += incidentHTML;                
+                    iElement.innerHTML += incidentHTML;
                 }
-   
+
                 iRow.appendChild(iElement);
                 wrapper.appendChild(iRow);
             }
@@ -249,14 +249,14 @@ Module.register("MMM-DCMetroTimes", {
                 iElement.innerHTML += "No Incidents Reported";
                 iRow.appendChild(iElement);
                 wrapper.appendChild(iRow);
-            }            
+            }
         }
         // if set to show station train times and there is data for it
         if (this.config.showStationTrainTimes && (this.dataStationTrainTimesList !== null))
         {
             // iterate through each station in config station list
             for (var curStationIndex = 0; curStationIndex < this.config.stationsToShowList.length; curStationIndex++)
-            {                      
+            {
                 var stationCode = this.config.stationsToShowList[curStationIndex];
                 var cStation = this.dataStationTrainTimesList[stationCode];
                 // if a matching station was found in the data returned from the helper
@@ -267,10 +267,10 @@ Module.register("MMM-DCMetroTimes", {
                     var headElement = document.createElement("td");
                     headElement.align = "right";
                     headElement.colSpan = "3";
-                    headElement.className = "small";                    
-                    headElement.innerHTML = cStation.StationName;                   
+                    headElement.className = "small";
+                    headElement.innerHTML = cStation.StationName;
                     headRow.appendChild(headElement);
-                    wrapper.appendChild(headRow);                               
+                    wrapper.appendChild(headRow);
                     // if there are train times in the list
                     if (cStation.TrainList.length > 0)
                     {
@@ -295,17 +295,17 @@ Module.register("MMM-DCMetroTimes", {
                             destElement.align = "left";
                             destElement.innerHTML = cTrain.Destination;
                             var minElement = document.createElement("td");
-                            minElement.align = "right";                                 
+                            minElement.align = "right";
                             minElement.innerHTML = cTrain.Min;
                             trainRow.appendChild(lineElement);
                             trainRow.appendChild(destElement);
                             trainRow.appendChild(minElement);
-                            wrapper.appendChild(trainRow);                                  
+                            wrapper.appendChild(trainRow);
                         }
                     }
                     // if no train times for this station then say so
                     else
-                    {                        
+                    {
                         var trainRow = document.createElement("tr");
                         trainRow.className = "xsmall";
                         trainRow.align = "left";
@@ -315,22 +315,28 @@ Module.register("MMM-DCMetroTimes", {
                         destElement.align = "left";
                         destElement.innerHTML = "No Trains"
                         var minElement = document.createElement("td");
-                        minElement.align = "right";                                 
+                        minElement.align = "right";
                         minElement.innerHTML = "";
                         trainRow.appendChild(lineElement);
                         trainRow.appendChild(destElement);
                         trainRow.appendChild(minElement);
-                        wrapper.appendChild(trainRow);  
-                    }                           
-                }                                           
-            }   
+                        wrapper.appendChild(trainRow);
+                    }
+                }
+            }
         }
         // if set to show bus times and there is data for it
         if (this.config.showBusStopTimes && (this.dataBusStopTimesList !== null))
         {
+            // NEW: create header for buses to space out the data
+            var busHeadRow = document.createElement("tr");
+            var busHeadElement = document.createElement("td");
+            busHeadElement.className = "header";
+            busHeadElement.align = "center";
+            busHeadElement.innerHTML = cStop.StopName;
             // iterate through each stop in config stop list
             for (var curStopIndex = 0; curStopIndex < this.config.stopsToShowList.length; curStopIndex++)
-            {                      
+            {
                 var stopID = this.config.stopsToShowList[curStopIndex];
                 var cStop = this.dataBusStopTimesList[stopID];
                 // if a matching station was found in the data returned from the helper
@@ -341,10 +347,10 @@ Module.register("MMM-DCMetroTimes", {
                     var headElement = document.createElement("td");
                     headElement.align = "right";
                     headElement.colSpan = "3";
-                    headElement.className = "small";                    
-                    headElement.innerHTML = cStop.StopName;                   
+                    headElement.className = "small";
+                    headElement.innerHTML = cStop.StopName;
                     headRow.appendChild(headElement);
-                    wrapper.appendChild(headRow);                               
+                    wrapper.appendChild(headRow);
                     // if there are bus times in the list
                     if (cStop.BusList.length > 0)
                     {
@@ -367,17 +373,17 @@ Module.register("MMM-DCMetroTimes", {
                             destElement.align = "left";
                             destElement.innerHTML = cBus.DirectionText;
                             var minElement = document.createElement("td");
-                            minElement.align = "right";                                 
+                            minElement.align = "right";
                             minElement.innerHTML = cBus.Min;
                             busRow.appendChild(lineElement);
                             busRow.appendChild(destElement);
                             busRow.appendChild(minElement);
-                            wrapper.appendChild(busRow);                                  
+                            wrapper.appendChild(busRow);
                         }
                     }
                     // if no train times for this station then say so
                     else
-                    {                        
+                    {
                         var busRow = document.createElement("tr");
                         busRow.className = "xsmall";
                         busRow.align = "left";
@@ -387,20 +393,20 @@ Module.register("MMM-DCMetroTimes", {
                         destElement.align = "left";
                         destElement.innerHTML = "No Buses"
                         var minElement = document.createElement("td");
-                        minElement.align = "right";                                 
+                        minElement.align = "right";
                         minElement.innerHTML = "";
                         busRow.appendChild(lineElement);
                         busRow.appendChild(destElement);
                         busRow.appendChild(minElement);
-                        wrapper.appendChild(busRow);  
-                    }                           
-                }                                           
+                        wrapper.appendChild(busRow);
+                    }
+                }
             }
-        } 
+        }
         // return the generated code
-        return wrapper;     
+        return wrapper;
     }
-    
+
 });
 
 // ------------ END -------------
