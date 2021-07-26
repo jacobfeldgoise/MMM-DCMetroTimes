@@ -326,14 +326,13 @@ Module.register("MMM-DCMetroTimes", {
             }
         }
         // if set to show bus times and there is data for it
-        if (this.config.showBusStopTimes && (this.dataBusStopTimesList !== null))
-        {
+        if (this.config.showBusStopTimes && (this.dataBusStopTimesList !== null)) {
             // NEW: create header for buses to space out the data
             var busHeadRow = document.createElement("tr");
             var busHeadElement = document.createElement("td");
             busHeadElement.className = "header";
             busHeadElement.align = "center";
-            busHeadElement.innerHTML = cStop.StopName;
+            busHeadElement.innerHTML = "DC Bus Times";
             // iterate through each stop in config stop list
             for (var curStopIndex = 0; curStopIndex < this.config.stopsToShowList.length; curStopIndex++)
             {
