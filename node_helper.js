@@ -343,7 +343,7 @@ module.exports = NodeHelper.create({
 			var responseContent, stopName, theBuses
 			for (let key in busStopList) {
 					responseContent = busStopList[key].raw;
-					console.log(responseContent);
+					//console.log(responseContent);
 					stopName = responseContent.StopName;
 					theBuses = responseContent.Predictions;
 					// iterate through the train times list
@@ -413,14 +413,14 @@ module.exports = NodeHelper.create({
 							let rawData = '';
 							res.on('data', (chunk) => rawData += chunk);
 							res.on('end', () => {
-									console.log(JSON.parse(rawData));
+									json = JSON.parse(rawData);
 							});
 					})
 					// if an error handle it
 					.on('error', (e) => {
 						self.processError();
 					});
-
+					console.log(json);
 					busStopList[stopID].raw = json;
 			}
 			// once you have all the data send it to be parsed
