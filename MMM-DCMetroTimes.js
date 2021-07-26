@@ -334,6 +334,8 @@ Module.register("MMM-DCMetroTimes", {
             busHeadElement.align = "center";
             busHeadElement.colSpan = "3";
             busHeadElement.innerHTML = "DC Bus Times";
+            busHeadRow.appendChild(busHeadElement);
+            wrapper.appendChild(busHeadRow);
             // iterate through each stop in config stop list
             for (var curStopIndex = 0; curStopIndex < this.config.stopsToShowList.length; curStopIndex++)
             {
