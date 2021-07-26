@@ -393,7 +393,7 @@ module.exports = NodeHelper.create({
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
 	    var self = this;
-			var json = "";
+			var resp = "";
 	    // build an empty list in case some stations have no trains times
 	    var busStopList = this.getEmptyBusStopTimesList(theConfig);
         // iterate through comma delimited stopIDs, build accordingly and return result
@@ -409,18 +409,18 @@ module.exports = NodeHelper.create({
 			    					}
 					};
 					// make the async call
-					json = https.get(params, (res) => {
+					resp = https.get(params, (res) => {
 							let rawData = '';
 							res.on('data', (chunk) => rawData += chunk);
 							res.on('end', () => {
-									json = JSON.parse(rawData);
+									this.rawJSON = JSON.parse(rawData);
 							});
 					})
 					// if an error handle it
 					.on('error', (e) => {
 						self.processError();
 					});
-					console.log(json);
+					console.log(resp.rawJSON);
 					busStopList[stopID].raw = json;
 			}
 			// once you have all the data send it to be parsed
