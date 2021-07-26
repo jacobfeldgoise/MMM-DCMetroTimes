@@ -407,7 +407,7 @@ module.exports = NodeHelper.create({
 	    					}
 			};
 			// Now go retrieve the data
-			self.combineBusData(self, theConfig.stopsToShowList, params, busStopList);
+			self.combineBusData(self, theConfig, theConfig.stopsToShowList, params, busStopList);
 	},
 	callBusAPI: function(id, params, busStopList){
 	  return new Promise((resolve, reject) => {
@@ -426,7 +426,7 @@ module.exports = NodeHelper.create({
 		  });
 		});
 	},
-	combineBusData: function(self, ids, params, busStopList) {
+	combineBusData: function(self, theConfig, ids, params, busStopList) {
 		Promise.all(ids.map(id => self.callBusAPI(id, params, busStopList))).then((combined) => {
 			combinedFormatted = Object.assign({}, ...combined)
 			for (var key in combinedFormatted){
