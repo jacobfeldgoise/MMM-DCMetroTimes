@@ -338,45 +338,53 @@ module.exports = NodeHelper.create({
         return true;
 	},
 	// does the work of parsing the bus times from the REST call
-	parseBusTimes: function(theConfig, stopID, responseContent, busStopList) {
-		var stopName = responseContent.StopName;
-		var theBuses = responseContent.Predictions;
-        // iterate through the train times list
-	    for (var cIndex = 0; cIndex < theBuses.length; cIndex++){
-	        var bus = theBuses[cIndex];
-            // make sure there is a destination code
-	        if (bus.RouteID !== null)
-	        {
-                // get all the parts of the bus time
-	            var bRouteID     		= bus.RouteID;
-	            var bDirectionText		= bus.DirectionText;
-	            var bDirectionNum     	= bus.DirectionNum;
-	            var bMinutes  			= bus.Minutes;
-	            var bVehicleID  		= bus.VehicleID;
-	            var bTripID             = bus.TripID;
-	            var busListPart 		= busStopList[stopID].BusList;
-                // build the bus part
-	            var busPart = {
-            		DirectionText: bDirectionText,
-                	DirectionNum: bDirectionNum,
-                	RouteID: bRouteID,
-                	Min: bMinutes
-                };
-                // if route ID isn't on the list of exclusions and
-                // it is not missing any of the required fields, then add
-                // it to the list
-	            if ( this.doesNotContainExcludedRoute(theConfig, stopID, bRouteID)
-                    && this.isWithinConfigThreshold(theConfig, bMinutes)
-                    && (bDirectionText !== '')
-                    && (bDirectionNum !== '')
-                    && (bMinutes !== '') )
-	            	busListPart[busListPart.length] = busPart;
-                // set the main station train list object to the train list part
-	            busStopList[stopID].BusList = busListPart;
-	            busStopList[stopID].StopName = stopName;
-	        }
-	    }
-			return busStopList
+	parseBusTimes: function(theConfig, busStopList) {
+			for (let key in busStopList) {
+					var responseContent = busStopList[key].raw;
+					var stopName = responseContent.StopName;
+					var theBuses = responseContent.Predictions;
+					// iterate through the train times list
+			    for (var cIndex = 0; cIndex < theBuses.length; cIndex++){
+			        var bus = theBuses[cIndex];
+		            // make sure there is a destination code
+			        if (bus.RouteID !== null)
+			        {
+		                // get all the parts of the bus time
+			            var bRouteID     		= bus.RouteID;
+			            var bDirectionText		= bus.DirectionText;
+			            var bDirectionNum     	= bus.DirectionNum;
+			            var bMinutes  			= bus.Minutes;
+			            var bVehicleID  		= bus.VehicleID;
+			            var bTripID             = bus.TripID;
+			            var busListPart 		= busStopList[key].BusList;
+		                // build the bus part
+			            var busPart = {
+		            		DirectionText: bDirectionText,
+		                	DirectionNum: bDirectionNum,
+		                	RouteID: bRouteID,
+		                	Min: bMinutes
+		                };
+		                // if route ID isn't on the list of exclusions and
+		                // it is not missing any of the required fields, then add
+		                // it to the list
+			            if ( this.doesNotContainExcludedRoute(theConfig, key, bRouteID)
+		                    && this.isWithinConfigThreshold(theConfig, bMinutes)
+		                    && (bDirectionText !== '')
+		                    && (bDirectionNum !== '')
+		                    && (bMinutes !== '') )
+			            	busListPart[busListPart.length] = busPart;
+		                // set the main station train list object to the train list part
+			            busStopList[key].BusList = busListPart;
+			            busStopList[key].StopName = stopName;
+			        }
+			    }
+					// return payload is the module id and the station train list
+					var returnPayload = {
+							identifier: theConfig.identifier,
+							busStopList: busStopList
+					};
+					this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
+			}
 	},
 	// makes the call to get the bus times list
 	updateBusTimes: function(theConfig){
@@ -400,8 +408,7 @@ module.exports = NodeHelper.create({
 		    	let rawData = '';
 		      	res.on('data', (chunk) => rawData += chunk);
 		      	res.on('end', () => {
-	            	// once you have all the data send it to be parsed
-		        	busStopList = self.parseBusTimes(theConfig, stopID, JSON.parse(rawData), busStopList);
+								busStopList[stopID].raw = JSON.parse(rawData)
 		      	});
 		    })
 	        // if an error handle it
@@ -409,14 +416,10 @@ module.exports = NodeHelper.create({
 	            self.processError();
 		    });
 		}
-
-		// return payload is the module id and the station train list
-		var returnPayload = {
-				identifier: theConfig.identifier,
-				busStopList: busStopList
-		};
-		this.sendSocketNotification('DCMETRO_BUSTOPTIMES_UPDATE', returnPayload);
-	}
+		// once you have all the data send it to be parsed
+		console.log(busStopList);
+		self.parseBusTimes(theConfig, busStopList);
+	};
 });
 
 //------------ END -------------
