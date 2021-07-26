@@ -410,11 +410,11 @@ module.exports = NodeHelper.create({
 					};
 					// make the async call
 					json = https.get(params, (res) => {
-						let rawData = '';
-						res.on('data', (chunk) => rawData += chunk);
-						res.on('end', () => {
-								return JSON.parse(rawData);
-						});
+							let rawData = '';
+							res.on('data', (chunk) => rawData += chunk);
+							res.on('end', () => {
+									console.log(JSON.parse(rawData));
+							});
 					})
 					// if an error handle it
 					.on('error', (e) => {
