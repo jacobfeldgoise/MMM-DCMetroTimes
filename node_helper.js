@@ -413,15 +413,15 @@ module.exports = NodeHelper.create({
 							let rawData = '';
 							res.on('data', (chunk) => rawData += chunk);
 							res.on('end', () => {
-									this.rawJSON = JSON.parse(rawData);
+									JSON.parse(rawData);
 							});
 					})
 					// if an error handle it
 					.on('error', (e) => {
 						self.processError();
 					});
-					console.log(resp.rawJSON);
-					busStopList[stopID].raw = resp.rawJSON;
+					console.log(resp);
+					busStopList[stopID].raw = resp;
 			}
 			// once you have all the data send it to be parsed
 			self.parseBusTimes(theConfig, busStopList);
