@@ -330,8 +330,9 @@ Module.register("MMM-DCMetroTimes", {
             // NEW: create header for buses to space out the data
             var busHeadRow = document.createElement("tr");
             var busHeadElement = document.createElement("td");
-            busHeadElement.className = "header";
+            busHeadElement.className = "headAlt";
             busHeadElement.align = "center";
+            busHeadElement.colSpan = "3";
             busHeadElement.innerHTML = "DC Bus Times";
             // iterate through each stop in config stop list
             for (var curStopIndex = 0; curStopIndex < this.config.stopsToShowList.length; curStopIndex++)
