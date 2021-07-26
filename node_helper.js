@@ -427,7 +427,7 @@ module.exports = NodeHelper.create({
 		});
 	},
 	combineBusData: function(self, ids, params, busStopList) {
-		Promise.all(ids.map(id => callBusAPI(id, params, busStopList))).then((combined) => {
+		Promise.all(ids.map(id => self.callBusAPI(id, params, busStopList))).then((combined) => {
 			combinedFormatted = Object.assign({}, ...combined)
 			for (var key in combinedFormatted){
 				busStopList[key].raw = combinedFormatted[key]
