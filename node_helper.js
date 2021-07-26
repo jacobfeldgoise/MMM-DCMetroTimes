@@ -419,7 +419,7 @@ module.exports = NodeHelper.create({
 		// once you have all the data send it to be parsed
 		console.log(busStopList);
 		self.parseBusTimes(theConfig, busStopList);
-	};
+	}
 });
 
 //------------ END -------------
