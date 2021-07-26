@@ -340,10 +340,12 @@ module.exports = NodeHelper.create({
 	},
 	// does the work of parsing the bus times from the REST call
 	parseBusTimes: function(theConfig, busStopList) {
+			var responseContent, stopName, theBuses
 			for (let key in busStopList) {
-					var responseContent = busStopList[key].raw;
-					var stopName = responseContent.StopName;
-					var theBuses = responseContent.Predictions;
+					responseContent = busStopList[key].raw;
+					console.log(responseContent);
+					stopName = responseContent.StopName;
+					theBuses = responseContent.Predictions;
 					// iterate through the train times list
 			    for (var cIndex = 0; cIndex < theBuses.length; cIndex++){
 			        var bus = theBuses[cIndex];
@@ -420,10 +422,9 @@ module.exports = NodeHelper.create({
 					});
 
 					busStopList[stopID].raw = json;
-		}
-		// once you have all the data send it to be parsed
-		console.log(busStopList);
-		self.parseBusTimes(theConfig, busStopList);
+			}
+			// once you have all the data send it to be parsed
+			self.parseBusTimes(theConfig, busStopList);
 	}
 });
 
