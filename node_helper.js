@@ -421,7 +421,7 @@ module.exports = NodeHelper.create({
 						self.processError();
 					});
 					console.log(resp.rawJSON);
-					busStopList[stopID].raw = json;
+					busStopList[stopID].raw = resp.rawJSON;
 			}
 			// once you have all the data send it to be parsed
 			self.parseBusTimes(theConfig, busStopList);
